@@ -750,12 +750,12 @@ static ResultCode CreateThread(Handle* out_handle, u32 priority, u32 entry_point
                  "Newly created thread is allowed to be run in any Core, unimplemented.");
         break;
     case THREADPROCESSORID_1:
-        LOG_ERROR(Kernel_SVC,
-                  "Newly created thread must run in the SysCore (Core1), unimplemented.");
+        LOG_WARNING(Kernel_SVC,
+                   "Newly created thread is allowed to be run in the SysCore (Core1), unimplemented.");
         break;
     case THREADPROCESSORID_2:
-        LOG_ERROR(Kernel_SVC,
-                  "Newly created thread must run in the SysCore (Core2), unimplemented.");
+        LOG_WARNING(Kernel_SVC,
+                    "Newly created thread is allowed to be run in the SysCore (Core2), unimplemented.");
         break;
     default:
         // TODO(bunnei): Implement support for other processor IDs
