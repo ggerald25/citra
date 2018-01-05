@@ -13,7 +13,6 @@
 #include "common/common_types.h"
 #include "common/logging/log.h"
 #include "core/core_timing.h"
-#include "core/settings.h"
 #include "core/hle/service/dsp_dsp.h"
 
 namespace AudioCore {
@@ -170,26 +169,17 @@ void DspHle::Impl::PipeWrite(DspPipe pipe_number, const std::vector<u8>& buffer)
                       "Application has requested unknown state transition of DSP hardware %hhu",
                       buffer[0]);
             dsp_state = DspState::Off;
-            break;
         }
 
         return;
     }
-
-    case DspPipe::Binary:
-        if (Settings::values.enable_pipe3) {
-            std::copy(buffer.begin(), buffer.end(), std::back_inserter(pipe_data[static_cast<size_t>(DspPipe::Binary)]));
-            return;
-        } else {
-            LOG_CRITICAL(Audio_DSP, "pipe_number = %zu unimplemented",
-                         static_cast<size_t>(pipe_number));
-            UNIMPLEMENTED();
-            return;
-        }
     default:
         LOG_CRITICAL(Audio_DSP, "pipe_number = %zu unimplemented",
                      static_cast<size_t>(pipe_number));
         UNIMPLEMENTED();
+        return;
+    case DspPipe::Binary:
+        std::copy(buffer.begin(), buffer.end(), std::back_inserter(pipe_data[static_cast<size_t>(DspPipe::Binary)]));
         return;
     }
 }
