@@ -17,6 +17,7 @@
 #include <QtWidgets>
 #include "citra_qt/aboutdialog.h"
 #include "citra_qt/bootmanager.h"
+#include "citra_qt/cheat_gui.h"
 #include "citra_qt/configuration/config.h"
 #include "citra_qt/configuration/configure_dialog.h"
 #include "citra_qt/debugger/graphics/graphics.h"
@@ -356,6 +357,7 @@ void GMainWindow::RestoreUIState() {
     microProfileDialog->setVisible(UISettings::values.microprofile_visible);
 #endif
 
+    ui.action_Cheats->setEnabled(false);
     game_list->LoadInterfaceLayout();
 
     ui.action_Single_Window_Mode->setChecked(UISettings::values.single_window_mode);
@@ -404,6 +406,7 @@ void GMainWindow::ConnectMenuEvents() {
     connect(ui.action_Report_Compatibility, &QAction::triggered, this,
             &GMainWindow::OnMenuReportCompatibility);
     connect(ui.action_Configure, &QAction::triggered, this, &GMainWindow::OnConfigure);
+    connect(ui.action_Cheats, SIGNAL(triggered()), this, SLOT(OnCheats()));
 
     // View
     connect(ui.action_Single_Window_Mode, &QAction::triggered, this,
@@ -668,6 +671,7 @@ void GMainWindow::ShutdownGame() {
     ui.action_Pause->setEnabled(false);
     ui.action_Stop->setEnabled(false);
     ui.action_Report_Compatibility->setEnabled(false);
+    ui.action_Cheats->setEnabled(false);
     render_window->hide();
     game_list->show();
     game_list->setFilterFocus();
@@ -867,6 +871,7 @@ void GMainWindow::OnStartGame() {
 
     ui.action_Start->setEnabled(false);
     ui.action_Start->setText(tr("Continue"));
+    ui.action_Cheats->setEnabled(true);
 
     ui.action_Pause->setEnabled(true);
     ui.action_Stop->setEnabled(true);
@@ -989,6 +994,14 @@ void GMainWindow::OnCreateGraphicsSurfaceViewer() {
     addDockWidget(Qt::RightDockWidgetArea, graphicsSurfaceViewerWidget);
     // TODO: Maybe graphicsSurfaceViewerWidget->setFloating(true);
     graphicsSurfaceViewerWidget->show();
+}
+
+void GMainWindow::OnCheats() {
+    if (cheatWindow == nullptr)
+    {
+        cheatWindow = std::make_shared<CheatDialog>(this);
+    }
+    cheatWindow->show();
 }
 
 static void BringWidgetToFront(QWidget* widget) {

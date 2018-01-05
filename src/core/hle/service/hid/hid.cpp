@@ -29,6 +29,7 @@ constexpr u64 gyroscope_update_ticks = BASE_CLOCK_RATE_ARM11 / 101;
 
 constexpr float accelerometer_coef = 512.0f; // measured from hw test result
 constexpr float gyroscope_coef = 14.375f; // got from hwtest GetGyroscopeLowRawToDpsCoefficient call
+PadState inputs_this_frame;
 
 DirectionState GetStickDirectionState(s16 circle_pad_x, s16 circle_pad_y) {
     // 30 degree and 60 degree are angular thresholds for directions
@@ -122,6 +123,7 @@ void Module::UpdatePadCallback(u64 userdata, int cycles_late) {
     pad_entry.delta_removals.hex = changed.hex & old_state.hex;
     pad_entry.circle_pad_x = circle_pad_x;
     pad_entry.circle_pad_y = circle_pad_y;
+    inputs_this_frame.hex = state.hex;
 
     // If we just updated index 0, provide a new timestamp
     if (mem->pad.index == 0) {
@@ -199,6 +201,10 @@ void Module::UpdateAccelerometerCallback(u64 userdata, int cycles_late) {
 
     // Reschedule recurrent event
     CoreTiming::ScheduleEvent(accelerometer_update_ticks - cycles_late, accelerometer_update_event);
+}
+
+PadState& GetInputsThisFrame() {
+    return inputs_this_frame;
 }
 
 void Module::UpdateGyroscopeCallback(u64 userdata, int cycles_late) {
