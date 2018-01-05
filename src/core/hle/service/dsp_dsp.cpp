@@ -203,6 +203,29 @@ static void FlushDataCache(Service::Interface* self) {
 }
 
 /**
+ * DSP_DSP::InvalidateDCache service function
+ *
+ * This Function is a no-op, We aren't emulating the CPU cache any time soon.
+ *
+ *  Inputs:
+ *      1 : Address
+ *      2 : Size
+ *      3 : Value 0, some descriptor for the KProcess Handle
+ *      4 : KProcess handle
+ *  Outputs:
+ *      1 : Result of function, 0 on success, otherwise error code
+ */
+static void InvalidateDCache(Service::Interface* self) {
+    u32* cmd_buff = Kernel::GetCommandBuffer();
+    u32 address = cmd_buff[1];
+    u32 size = cmd_buff[2];
+    u32 process = cmd_buff[4];
+
+    cmd_buff[0] = IPC::MakeHeader(0x14, 1, 0);
+    cmd_buff[1] = RESULT_SUCCESS.raw; // No error
+ }
+
+/**
  * DSP_DSP::RegisterInterruptEvents service function
  *  Inputs:
  *      1 : Interrupt Type
@@ -574,7 +597,7 @@ const Interface::FunctionInfo FunctionTable[] = {
     {0x001100C2, LoadComponent, "LoadComponent"},
     {0x00120000, nullptr, "UnloadComponent"},
     {0x00130082, FlushDataCache, "FlushDataCache"},
-    {0x00140082, nullptr, "InvalidateDCache"},
+    {0x00140082, InvalidateDCache, "InvalidateDCache"},
     {0x00150082, RegisterInterruptEvents, "RegisterInterruptEvents"},
     {0x00160000, GetSemaphoreEventHandle, "GetSemaphoreEventHandle"},
     {0x00170040, SetSemaphoreMask, "SetSemaphoreMask"},
